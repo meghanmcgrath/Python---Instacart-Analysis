@@ -1,0 +1,482 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "3fc8a804-d31b-4646-9bc9-a326838cfd29",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Import Libraries\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import os\n",
+    "import matplotlib.pyplot as plt\n",
+    "import seaborn as sns\n",
+    "import scipy"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "af90b6bf-2251-4880-a680-e955293ac509",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "path = r'/Users/meghanmcgrath/Documents/Instacart Basket Analysis/02 Data'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "cbd9939a-6ce7-4993-a0ca-f5f3c12b00e8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_new_10 = pd.read_pickle(os.path.join(path, 'Prepared Data', 'df_ex10_excl.pkl'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "c8d3f716-160d-498a-916d-827d2a875f20",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "Index: 30964564 entries, 0 to 32404817\n",
+      "Data columns (total 37 columns):\n",
+      " #   Column                   Dtype         \n",
+      "---  ------                   -----         \n",
+      " 0   user_id                  int64         \n",
+      " 1   first_name               object        \n",
+      " 2   last_name                object        \n",
+      " 3   gender                   object        \n",
+      " 4   state                    object        \n",
+      " 5   age                      int64         \n",
+      " 6   date_joined              datetime64[ns]\n",
+      " 7   dependants               int64         \n",
+      " 8   family_status            object        \n",
+      " 9   income                   int64         \n",
+      " 10  product_id               int64         \n",
+      " 11  product_name             object        \n",
+      " 12  aisle_id                 int64         \n",
+      " 13  department_id            int64         \n",
+      " 14  prices                   float64       \n",
+      " 15  order_id                 int64         \n",
+      " 16  order_number             int64         \n",
+      " 17  orders_day_of_week       int64         \n",
+      " 18  order_hour_of_day        int64         \n",
+      " 19  days_since_last_order    float64       \n",
+      " 20  first_order              bool          \n",
+      " 21  add_to_cart_order        int64         \n",
+      " 22  reordered                int64         \n",
+      " 23  price_range_loc          object        \n",
+      " 24  busiest_day              object        \n",
+      " 25  busiest_days             object        \n",
+      " 26  busiest_period_of_day    object        \n",
+      " 27  max_order                int64         \n",
+      " 28  loyalty_flag             object        \n",
+      " 29  mean_product_price       float64       \n",
+      " 30  spending_flag            object        \n",
+      " 31  median_order_frequency   float64       \n",
+      " 32  median_days_btwn_orders  float64       \n",
+      " 33  order_frequency          object        \n",
+      " 34  _merge                   category      \n",
+      " 35  region                   object        \n",
+      " 36  exclusion flag           bool          \n",
+      "dtypes: bool(2), category(1), datetime64[ns](1), float64(5), int64(14), object(14)\n",
+      "memory usage: 8.2+ GB\n"
+     ]
+    }
+   ],
+   "source": [
+    "df_new_10.info()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "8e6869cb-feb5-4e14-b885-bc8e8aff1e36",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0           0.005970\n",
+      "1           0.005970\n",
+      "2           0.005970\n",
+      "3           0.015536\n",
+      "4           0.015536\n",
+      "              ...   \n",
+      "32404813    0.021235\n",
+      "32404814    0.021235\n",
+      "32404815    0.021235\n",
+      "32404816    0.006784\n",
+      "32404817    0.012076\n",
+      "Name: prices, Length: 30964564, dtype: float64\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Detect outliers - calculate x z score\n",
+    "z = np.abs(scipy.stats.zscore(df_new_10['prices']))\n",
+    "print(z)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "417af15f-2c7a-448c-8e4b-410cff93e014",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "          user_id first_name last_name  gender         state  age date_joined  \\\n",
+      "5594       117740       Lisa    Sparks  Female        Oregon   55  2017-01-01   \n",
+      "10355       31590    Beverly   Sanford  Female       Montana   46  2017-01-01   \n",
+      "27973      100958   Benjamin   Parsons    Male  North Dakota   18  2017-01-02   \n",
+      "27974      100958   Benjamin   Parsons    Male  North Dakota   18  2017-01-02   \n",
+      "27975      100958   Benjamin   Parsons    Male  North Dakota   18  2017-01-02   \n",
+      "...           ...        ...       ...     ...           ...  ...         ...   \n",
+      "32391295     5519      Kathy    Daniel  Female       Georgia   78  2020-04-01   \n",
+      "32391296     5519      Kathy    Daniel  Female       Georgia   78  2020-04-01   \n",
+      "32391297     5519      Kathy    Daniel  Female       Georgia   78  2020-04-01   \n",
+      "32396982   140589   Clarence    Harper    Male      Maryland   26  2020-04-01   \n",
+      "32400031   200065       Gary    Wilson    Male     Tennessee   59  2020-04-01   \n",
+      "\n",
+      "          dependants                     family_status  income  ...  \\\n",
+      "5594               1                           married  292759  ...   \n",
+      "10355              0                            single  154076  ...   \n",
+      "27973              2  living with parents and siblings  113408  ...   \n",
+      "27974              2  living with parents and siblings  113408  ...   \n",
+      "27975              2  living with parents and siblings  113408  ...   \n",
+      "...              ...                               ...     ...  ...   \n",
+      "32391295           3                           married  262610  ...   \n",
+      "32391296           3                           married  262610  ...   \n",
+      "32391297           3                           married  262610  ...   \n",
+      "32396982           0                            single  154845  ...   \n",
+      "32400031           3                           married  243617  ...   \n",
+      "\n",
+      "          max_order      loyalty_flag  mean_product_price  spending_flag  \\\n",
+      "5594             84    Loyal customer           36.928431   High spender   \n",
+      "10355            38  Regular customer           58.139865   High spender   \n",
+      "27973             5      New customer          627.991667   High spender   \n",
+      "27974             5      New customer          627.991667   High spender   \n",
+      "27975             5      New customer          627.991667   High spender   \n",
+      "...             ...               ...                 ...            ...   \n",
+      "32391295         53    Loyal customer           69.638604   High spender   \n",
+      "32391296         53    Loyal customer           69.638604   High spender   \n",
+      "32391297         53    Loyal customer           69.638604   High spender   \n",
+      "32396982          9      New customer          876.974783   High spender   \n",
+      "32400031         18  Regular customer           96.595833   High spender   \n",
+      "\n",
+      "          median_order_frequency  median_days_btwn_orders    order_frequency  \\\n",
+      "5594                    5.108268                      4.0  Frequent customer   \n",
+      "10355                  10.104530                      8.0  Frequent customer   \n",
+      "27973                  18.415584                     11.0   Regular customer   \n",
+      "27974                  18.415584                     11.0   Regular customer   \n",
+      "27975                  18.415584                     11.0   Regular customer   \n",
+      "...                          ...                      ...                ...   \n",
+      "32391295                6.627807                      7.0  Frequent customer   \n",
+      "32391296                6.627807                      7.0  Frequent customer   \n",
+      "32391297                6.627807                      7.0  Frequent customer   \n",
+      "32396982               19.330097                     20.0   Regular customer   \n",
+      "32400031               13.588235                     12.0   Regular customer   \n",
+      "\n",
+      "          _merge   region  exclusion flag  \n",
+      "5594        both     West           False  \n",
+      "10355       both     West           False  \n",
+      "27973       both  Midwest           False  \n",
+      "27974       both  Midwest           False  \n",
+      "27975       both  Midwest           False  \n",
+      "...          ...      ...             ...  \n",
+      "32391295    both    South           False  \n",
+      "32391296    both    South           False  \n",
+      "32391297    both    South           False  \n",
+      "32396982    both    South           False  \n",
+      "32400031    both    South           False  \n",
+      "\n",
+      "[4877 rows x 37 columns]\n"
+     ]
+    }
+   ],
+   "source": [
+    "threshold = 3\n",
+    "outliers = df_new_10[z > threshold]\n",
+    "print(outliers)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "baa75e31-3127-4885-88c5-af0b3ae8a06a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_final = df_new_10.drop(outliers.index)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "08619d66-7409-4132-b8dc-9d47171f4c60",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "Index: 30959687 entries, 0 to 32404817\n",
+      "Data columns (total 37 columns):\n",
+      " #   Column                   Dtype         \n",
+      "---  ------                   -----         \n",
+      " 0   user_id                  int64         \n",
+      " 1   first_name               object        \n",
+      " 2   last_name                object        \n",
+      " 3   gender                   object        \n",
+      " 4   state                    object        \n",
+      " 5   age                      int64         \n",
+      " 6   date_joined              datetime64[ns]\n",
+      " 7   dependants               int64         \n",
+      " 8   family_status            object        \n",
+      " 9   income                   int64         \n",
+      " 10  product_id               int64         \n",
+      " 11  product_name             object        \n",
+      " 12  aisle_id                 int64         \n",
+      " 13  department_id            int64         \n",
+      " 14  prices                   float64       \n",
+      " 15  order_id                 int64         \n",
+      " 16  order_number             int64         \n",
+      " 17  orders_day_of_week       int64         \n",
+      " 18  order_hour_of_day        int64         \n",
+      " 19  days_since_last_order    float64       \n",
+      " 20  first_order              bool          \n",
+      " 21  add_to_cart_order        int64         \n",
+      " 22  reordered                int64         \n",
+      " 23  price_range_loc          object        \n",
+      " 24  busiest_day              object        \n",
+      " 25  busiest_days             object        \n",
+      " 26  busiest_period_of_day    object        \n",
+      " 27  max_order                int64         \n",
+      " 28  loyalty_flag             object        \n",
+      " 29  mean_product_price       float64       \n",
+      " 30  spending_flag            object        \n",
+      " 31  median_order_frequency   float64       \n",
+      " 32  median_days_btwn_orders  float64       \n",
+      " 33  order_frequency          object        \n",
+      " 34  _merge                   category      \n",
+      " 35  region                   object        \n",
+      " 36  exclusion flag           bool          \n",
+      "dtypes: bool(2), category(1), datetime64[ns](1), float64(5), int64(14), object(14)\n",
+      "memory usage: 8.2+ GB\n"
+     ]
+    }
+   ],
+   "source": [
+    "df_final.info()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "0590319a-e737-47a8-802c-ae24b8df413d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_new_10.to_pickle(os.path.join(path, 'Prepared Data', 'df_no_outliers.pkl'))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "626596a5-5619-40a3-b7d6-0afb68e04dec",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>income</th>\n",
+       "      <th>age</th>\n",
+       "      <th>dependants</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>3.096456e+07</td>\n",
+       "      <td>3.096456e+07</td>\n",
+       "      <td>3.096456e+07</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>9.967587e+04</td>\n",
+       "      <td>4.946803e+01</td>\n",
+       "      <td>1.501819e+00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>4.314187e+04</td>\n",
+       "      <td>1.848528e+01</td>\n",
+       "      <td>1.118896e+00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>2.590300e+04</td>\n",
+       "      <td>1.800000e+01</td>\n",
+       "      <td>0.000000e+00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>6.729200e+04</td>\n",
+       "      <td>3.300000e+01</td>\n",
+       "      <td>1.000000e+00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>9.676500e+04</td>\n",
+       "      <td>4.900000e+01</td>\n",
+       "      <td>2.000000e+00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>1.281020e+05</td>\n",
+       "      <td>6.500000e+01</td>\n",
+       "      <td>3.000000e+00</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>5.939010e+05</td>\n",
+       "      <td>8.100000e+01</td>\n",
+       "      <td>3.000000e+00</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "             income           age    dependants\n",
+       "count  3.096456e+07  3.096456e+07  3.096456e+07\n",
+       "mean   9.967587e+04  4.946803e+01  1.501819e+00\n",
+       "std    4.314187e+04  1.848528e+01  1.118896e+00\n",
+       "min    2.590300e+04  1.800000e+01  0.000000e+00\n",
+       "25%    6.729200e+04  3.300000e+01  1.000000e+00\n",
+       "50%    9.676500e+04  4.900000e+01  2.000000e+00\n",
+       "75%    1.281020e+05  6.500000e+01  3.000000e+00\n",
+       "max    5.939010e+05  8.100000e+01  3.000000e+00"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_new_10[['income','age','dependants']].describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "c4afdc8e-1ecf-444e-8903-7606d63f1ca8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Setting thresholds\n",
+    "def income_level(row):\n",
+    "    if row['income'] <= 50000:\n",
+    "        return 'Low income'\n",
+    "    elif (row['income'] > 50000) and (row['income'] <= 100000):\n",
+    "        return 'Medium income'\n",
+    "    elif row['income'] > 100000:\n",
+    "        return 'High income'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "2c80f3ed-c430-486f-b703-747b5dd88186",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Apply thresholds\n",
+    "df_new_10 = df_new_10.apply(income_level, axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "ed5a2673-7199-40d6-9aaf-2f4948a763f8",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(30964564,)"
+      ]
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df_new_10.shape"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "61dc7971-623e-4822-be9a-d34b73749517",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
